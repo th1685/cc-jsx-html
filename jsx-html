@@ -7,7 +7,7 @@
 #
 # Forked from https://gist.github.com/ericboehs/1dd34d61540272a37dbe6e9d2aba60dd
 
-set -euo pipefail
+set -eo pipefail
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: claude-jsx-to-html input.jsx [output.html]"
