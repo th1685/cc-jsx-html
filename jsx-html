@@ -2,12 +2,12 @@
 # Converts a Claude Desktop JSX artifact into a standalone HTML file
 # that runs directly in the browser via CDN-loaded React + Babel.
 #
-# Usage: claude-jsx-to-html input.jsx [output.html]
+# Usage: jsx-html input.jsx [output.html]
 #   If output is omitted, writes to input.html alongside the .jsx file.
 #
 # Forked from https://gist.github.com/ericboehs/1dd34d61540272a37dbe6e9d2aba60dd
 
-set -eo pipefail
+set -euo pipefail
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: claude-jsx-to-html input.jsx [output.html]"
@@ -45,9 +45,12 @@ done < <(grep "^import " "$INPUT" | grep -oE "from ('[^']+'|"'"'"[^"'"'"]+"'"'")
 
 # Build importmap entries for third-party packages
 IMPORTMAP_EXTRAS=""
-for pkg in "${PACKAGES[@]}"; do
-  IMPORTMAP_EXTRAS+="$(printf '\n      "%s": "https://esm.sh/%s?external=react",' "$pkg" "$pkg")"
-done
+if (( ${#PACKAGES[@]} != 0 )); then
+  for pkg in "${PACKAGES[@]}"; do
+    IMPORTMAP_EXTRAS+="$(printf '\n      "%s": "https://esm.sh/%s?external=react",' "$pkg" "$pkg")"
+  done
+fi
+
 # Remove trailing comma
 IMPORTMAP_EXTRAS="${IMPORTMAP_EXTRAS%,}"
 
