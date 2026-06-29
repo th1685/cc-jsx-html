@@ -60,7 +60,6 @@ s/([A-Za-z])([0-9])/\1 \2/g
 
 # Gather imports #############################################################
 
-declare -a SEEN
 PACKAGES=()
 IMPORT_LINES=()
 
@@ -88,9 +87,7 @@ while IFS= read -r line; do
             ;;
     esac
 
-    [[ -n "${SEEN[$pkg]:-}" ]] && continue
-
-    SEEN[$pkg]=1
+    for _p in "${PACKAGES[@]:-}"; do [[ "$_p" == "$pkg" ]] && continue 2; done
     PACKAGES+=("$pkg")
 
 done < <(grep -E '^[[:space:]]*import[[:space:]]' "$INPUT")
