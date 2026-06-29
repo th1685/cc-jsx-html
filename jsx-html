@@ -24,6 +24,9 @@ fi
 OUTPUT="${2:-${INPUT%.jsx}.html}"
 TMP=$(mktemp)
 
+# Add after OUTPUT is set
+mkdir -p "$(dirname "$OUTPUT")"
+
 cleanup() {
     rm -f "$TMP"
 }
@@ -91,6 +94,12 @@ while IFS= read -r line; do
     PACKAGES+=("$pkg")
 
 done < <(grep -E '^[[:space:]]*import[[:space:]]' "$INPUT")
+
+# After the existing grep/while block, check for suspected multi-line imports
+if grep -qE '^[[:space:]]*[A-Za-z_].*,$' "$INPUT" && \
+   grep -qE "^[[:space:]]*\} from ['\"]" "$INPUT"; then
+  echo "Warning: multi-line imports detected — some packages may be missing from the import map."
+fi
 
 # Import map #################################################################
 
